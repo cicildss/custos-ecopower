@@ -1,0 +1,15 @@
+node_modules/
+dist/
+build/
+
+*.log
+*.err.log
+__pycache__/
+*.py[cod]
+
+local-no-admin/*.sqlite
+local-no-admin/*.sqlite-*
+
+.env
+.env.*
+!.env.example

@@ -1,0 +1,113 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Sb1Produto {
+  id              Int       @id @default(autoincrement())
+  b1Filial        String?   @map("b1_filial") @db.VarChar(8)
+  b1Cod           String    @map("b1_cod") @db.VarChar(60)
+  b1Desc          String    @map("b1_desc")
+  b1DescNf        String?   @map("b1_desc_nf")
+  b1Um            String?   @map("b1_um") @db.VarChar(12)
+  b1Tipo          String?   @map("b1_tipo") @db.VarChar(20)
+  b1Grupo         String?   @map("b1_grupo") @db.VarChar(30)
+  b1Posipi        String?   @map("b1_posipi") @db.VarChar(30)
+  b1LocalPad      String?   @map("b1_local_pad") @db.VarChar(20)
+  b1Peso          Decimal?  @map("b1_peso") @db.Decimal(18, 6)
+  b1Pesbru        Decimal?  @map("b1_pesbru") @db.Decimal(18, 6)
+  b1Dtcad         DateTime? @map("b1_dtcad") @db.Date
+  b1AliqIcms      Decimal?  @map("b1_aliq_icms") @db.Decimal(18, 6)
+  b1AliqIpi       Decimal?  @map("b1_aliq_ipi") @db.Decimal(18, 6)
+  b1PrecoVenda    Decimal?  @map("b1_preco_venda") @db.Decimal(18, 6)
+  b1UltPreco      Decimal?  @map("b1_ult_preco") @db.Decimal(18, 6)
+  b1UltCompra     DateTime? @map("b1_ult_compra") @db.Date
+  extra           Json      @default("{}")
+  dELETE          String?   @map("d_e_l_e_t_") @db.Char(1)
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  @@index([b1Cod], map: "idx_sb1_produtos_b1_cod")
+  @@index([b1Desc], map: "idx_sb1_produtos_b1_desc")
+  @@map("sb1_produtos")
+}
+
+model Sb2Saldo {
+  id          Int      @id @default(autoincrement())
+  b2Filial    String?  @map("b2_filial") @db.VarChar(8)
+  b2Cod       String   @map("b2_cod") @db.VarChar(60)
+  b2Local     String?  @map("b2_local") @db.VarChar(20)
+  b2Qatu      Decimal? @map("b2_qatu") @db.Decimal(18, 6)
+  b2Cm1       Decimal? @map("b2_cm1") @db.Decimal(18, 6)
+  b2Descricao String?  @map("b2_descricao")
+  extra       Json     @default("{}")
+  dELETE      String?  @map("d_e_l_e_t_") @db.Char(1)
+
+  @@index([b2Cod], map: "idx_sb2_saldos_b2_cod")
+  @@map("sb2_saldos")
+}
+
+model Sd1ItemNf {
+  id        Int       @id @default(autoincrement())
+  d1Filial  String?   @map("d1_filial") @db.VarChar(8)
+  d1Item    String?   @map("d1_item") @db.VarChar(20)
+  d1Cod     String    @map("d1_cod") @db.VarChar(60)
+  d1Um      String?   @map("d1_um") @db.VarChar(12)
+  d1Quant   Decimal?  @map("d1_quant") @db.Decimal(18, 6)
+  d1Local   String?   @map("d1_local") @db.VarChar(20)
+  d1Vunit   Decimal?  @map("d1_vunit") @db.Decimal(18, 6)
+  d1Custo   Decimal?  @map("d1_custo") @db.Decimal(18, 6)
+  d1Total   Decimal?  @map("d1_total") @db.Decimal(18, 6)
+  d1Fornece String?   @map("d1_fornece") @db.VarChar(30)
+  d1Cliente String?   @map("d1_cliente") @db.VarChar(30)
+  d1Loja    String?   @map("d1_loja") @db.VarChar(10)
+  d1Doc     String?   @map("d1_doc") @db.VarChar(40)
+  d1Serie   String?   @map("d1_serie") @db.VarChar(20)
+  d1Emissao DateTime? @map("d1_emissao") @db.Date
+  d1Dtdigit DateTime? @map("d1_dtdigit") @db.Date
+  d1Grupo   String?   @map("d1_grupo") @db.VarChar(30)
+  d1Tipo    String?   @map("d1_tipo") @db.VarChar(20)
+  extra     Json      @default("{}")
+  dELETE    String?   @map("d_e_l_e_t_") @db.Char(1)
+
+  @@index([d1Cod], map: "idx_sd1_itens_nf_d1_cod")
+  @@index([d1Fornece, d1Loja], map: "idx_sd1_itens_nf_d1_fornece_d1_loja")
+  @@map("sd1_itens_nf")
+}
+
+model Sa1Cliente {
+  id          Int     @id @default(autoincrement())
+  a1Cod       String  @map("a1_cod") @db.VarChar(30)
+  a1Loja      String  @map("a1_loja") @db.VarChar(10)
+  a1Nome      String? @map("a1_nome")
+  a1Nreduz    String? @map("a1_nreduz")
+  a1Tipo      String? @map("a1_tipo") @db.VarChar(30)
+  a1Est       String? @map("a1_est") @db.VarChar(2)
+  a1Mun       String? @map("a1_mun")
+  a1Cgc       String? @map("a1_cgc") @db.VarChar(30)
+  extra       Json    @default("{}")
+  dELETE      String? @map("d_e_l_e_t_") @db.Char(1)
+
+  @@index([a1Cod, a1Loja], map: "idx_sa1_clientes_a1_cod_a1_loja")
+  @@map("sa1_clientes")
+}
+
+model Sa2Fornecedor {
+  id        Int     @id @default(autoincrement())
+  a2Cod     String  @map("a2_cod") @db.VarChar(30)
+  a2Loja    String  @map("a2_loja") @db.VarChar(10)
+  a2Nome    String? @map("a2_nome")
+  a2Nreduz  String? @map("a2_nreduz")
+  a2Est     String? @map("a2_est") @db.VarChar(2)
+  a2Mun     String? @map("a2_mun")
+  a2Cgc     String? @map("a2_cgc") @db.VarChar(30)
+  extra     Json    @default("{}")
+  dELETE    String? @map("d_e_l_e_t_") @db.Char(1)
+
+  @@index([a2Cod, a2Loja], map: "idx_sa2_fornecedores_a2_cod_a2_loja")
+  @@map("sa2_fornecedores")
+}
