@@ -18,11 +18,11 @@ export function ProductList({ products, selectedCode, loading, onSelect }: Produ
 
   return (
     <div className="overflow-hidden rounded-md border border-line bg-white">
-      {products.map((product) => {
+      {products.map((product, index) => {
         const selected = product.codigo === selectedCode;
         return (
           <button
-            key={product.codigo}
+            key={`${product.codigo}-${index}`}
             type="button"
             onClick={() => onSelect(product.codigo)}
             className={`block w-full border-b border-line px-4 py-3 text-left last:border-b-0 ${

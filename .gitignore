@@ -10,6 +10,9 @@ __pycache__/
 local-no-admin/*.sqlite
 local-no-admin/*.sqlite-*
 
+work/extracted-csv/
+work/pydeps/
+
 .env
 .env.*
 !.env.example

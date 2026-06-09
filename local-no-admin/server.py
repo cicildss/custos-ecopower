@@ -2,6 +2,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, unquote, urlparse
 import json
+import os
 import sqlite3
 import webbrowser
 
@@ -20,12 +21,21 @@ def connect():
 
 
 def init_db():
+    if DB_PATH.exists() and os.environ.get("FORCE_SEED") != "1":
+        return
+
     DB_PATH.parent.mkdir(parents=True, exist_ok=True)
     seed = json.loads(SEED_PATH.read_text(encoding="utf-8-sig"))
     con = connect()
     cur = con.cursor()
     cur.executescript(
         """
+        DROP TABLE IF EXISTS sd1_itens_nf;
+        DROP TABLE IF EXISTS sb2_saldos;
+        DROP TABLE IF EXISTS sb1_produtos;
+        DROP TABLE IF EXISTS sa1_clientes;
+        DROP TABLE IF EXISTS sa2_fornecedores;
+
         CREATE TABLE IF NOT EXISTS sb1_produtos (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           b1_cod TEXT NOT NULL,
@@ -41,6 +51,7 @@ def init_db():
           b1_preco_venda REAL,
           b1_ult_preco REAL,
           b1_ult_compra TEXT,
+          extra TEXT,
           d_e_l_e_t_ TEXT
         );
         CREATE TABLE IF NOT EXISTS sb2_saldos (
@@ -51,6 +62,7 @@ def init_db():
           b2_qatu REAL,
           b2_cm1 REAL,
           b2_descricao TEXT,
+          extra TEXT,
           d_e_l_e_t_ TEXT
         );
         CREATE TABLE IF NOT EXISTS sd1_itens_nf (
@@ -72,6 +84,20 @@ def init_db():
           d1_dtdigit TEXT,
           d1_grupo TEXT,
           d1_tipo TEXT,
+          extra TEXT,
+          d_e_l_e_t_ TEXT
+        );
+        CREATE TABLE IF NOT EXISTS sa1_clientes (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          a1_cod TEXT NOT NULL,
+          a1_loja TEXT NOT NULL,
+          a1_nome TEXT,
+          a1_nreduz TEXT,
+          a1_tipo TEXT,
+          a1_est TEXT,
+          a1_mun TEXT,
+          a1_cgc TEXT,
+          extra TEXT,
           d_e_l_e_t_ TEXT
         );
         CREATE TABLE IF NOT EXISTS sa2_fornecedores (
@@ -83,6 +109,7 @@ def init_db():
           a2_est TEXT,
           a2_mun TEXT,
           a2_cgc TEXT,
+          extra TEXT,
           d_e_l_e_t_ TEXT
         );
         CREATE INDEX IF NOT EXISTS idx_local_sb1_cod ON sb1_produtos (b1_cod);
@@ -93,12 +120,14 @@ def init_db():
         DELETE FROM sd1_itens_nf;
         DELETE FROM sb2_saldos;
         DELETE FROM sb1_produtos;
+        DELETE FROM sa1_clientes;
         DELETE FROM sa2_fornecedores;
         """
     )
     insert_many(cur, "sb1_produtos", seed["sb1"])
     insert_many(cur, "sb2_saldos", seed["sb2"])
     insert_many(cur, "sd1_itens_nf", seed["sd1"])
+    insert_many(cur, "sa1_clientes", seed.get("sa1", []))
     insert_many(cur, "sa2_fornecedores", seed["sa2"])
     con.commit()
     con.close()
@@ -110,7 +139,7 @@ def insert_many(cur, table, rows):
     keys = sorted({key for row in rows for key in row.keys()})
     columns = ", ".join(keys)
     placeholders = ", ".join(["?"] * len(keys))
-    values = [[row.get(key) for key in keys] for row in rows]
+    values = [[json.dumps(row.get(key), ensure_ascii=False) if isinstance(row.get(key), (dict, list)) else row.get(key) for key in keys] for row in rows]
     cur.executemany(f"INSERT INTO {table} ({columns}) VALUES ({placeholders})", values)
 
 
@@ -305,4 +334,3 @@ if __name__ == "__main__":
     except Exception:
         pass
     ThreadingHTTPServer((HOST, PORT), Handler).serve_forever()
-

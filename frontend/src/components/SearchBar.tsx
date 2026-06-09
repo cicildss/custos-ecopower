@@ -35,9 +35,9 @@ export function SearchBar({ value, onChange, suggestions, loading, onSelect }: S
           {!loading && suggestions.length === 0 && <div className="px-4 py-3 text-sm text-slate-600">Nenhum item encontrado.</div>}
 
           {!loading &&
-            suggestions.slice(0, 8).map((product) => (
+            suggestions.slice(0, 8).map((product, index) => (
               <button
-                key={product.codigo}
+                key={`${product.codigo}-${index}`}
                 type="button"
                 onMouseDown={(event) => event.preventDefault()}
                 onClick={() => {

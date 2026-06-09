@@ -20,6 +20,24 @@ run-local-no-admin.bat
 
 Ele sobe um servidor unico em `http://127.0.0.1:5173`, cria um SQLite local em `local-no-admin/consulta_produtos.sqlite` e usa o seed do projeto. Esse modo serve para testar a tela e os endpoints sem instalar Docker, PostgreSQL ou npm.
 
+### Carregar a base completa do XLSB na VM
+
+Para carregar todos os registros da planilha `scavjpv0.xlsb` no modo local sem admin, rode no PowerShell dentro da pasta do projeto:
+
+```powershell
+git pull
+Unblock-File "C:\CAMINHO\scavjpv0.xlsb"
+powershell -ExecutionPolicy Bypass -File work\export_xlsb_csv.ps1 -Source "C:\CAMINHO\scavjpv0.xlsb" -Sheets sa2
+powershell -ExecutionPolicy Bypass -File work\export_xlsb_csv.ps1 -Source "C:\CAMINHO\scavjpv0.xlsb" -Sheets sb1
+powershell -ExecutionPolicy Bypass -File work\export_xlsb_csv.ps1 -Source "C:\CAMINHO\scavjpv0.xlsb" -Sheets sb2
+powershell -ExecutionPolicy Bypass -File work\export_xlsb_csv.ps1 -Source "C:\CAMINHO\scavjpv0.xlsb" -Sheets sd1 -MaxColumns 100
+powershell -ExecutionPolicy Bypass -File work\export_xlsb_csv.ps1 -Source "C:\CAMINHO\scavjpv0.xlsb" -Sheets sa1
+py work\import_csv_sqlite.py --csv-dir work\extracted-csv --db local-no-admin\consulta_produtos.sqlite
+run-local-no-admin.bat
+```
+
+O import direto no SQLite evita versionar arquivos gigantes. Na base atual, a importacao carregou `SB1: 38482`, `SB2: 69916`, `SD1: 393067`, `SA1: 112028` e `SA2: 21014` registros.
+
 ### Opcao completa com Docker
 
 1. Suba banco, API e frontend:
