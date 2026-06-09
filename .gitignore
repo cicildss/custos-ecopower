@@ -4,6 +4,7 @@ build/
 
 *.log
 *.err.log
+*.tsbuildinfo
 __pycache__/
 *.py[cod]
 

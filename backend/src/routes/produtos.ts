@@ -79,8 +79,8 @@ produtosRouter.get("/:codigo", async (req, res, next) => {
       custo_unitario: unitCost(row.b2_cm1, row.b2_qatu),
     }));
 
-    const totalQuantidade = stock.reduce((sum, row) => sum + toNumber(row.b2_qatu), 0);
-    const totalCusto = stock.reduce((sum, row) => sum + toNumber(row.b2_cm1), 0);
+    const totalQuantidade = stockRows.reduce((sum, row) => sum + toNumber(row.b2_qatu), 0);
+    const totalCusto = stockRows.reduce((sum, row) => sum + toNumber(row.b2_cm1), 0);
 
     const [{ total }] = await prisma.$queryRaw<Array<{ total: bigint }>>`
       SELECT COUNT(*)::bigint AS total

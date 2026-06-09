@@ -5,10 +5,11 @@ export default {
   theme: {
     extend: {
       colors: {
-        ink: "#17202A",
-        line: "#D8DEE8",
-        panel: "#F7F9FC",
-        brand: "#0E7C86",
+        ink: "#F8FAFC",
+        line: "rgba(148, 163, 184, 0.18)",
+        panel: "rgba(11, 25, 42, 0.86)",
+        "panel-soft": "rgba(15, 34, 55, 0.72)",
+        brand: "#28D17C",
       },
     },
   },
