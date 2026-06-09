@@ -10,8 +10,8 @@ ROOT = Path(__file__).resolve().parents[1]
 DB_PATH = ROOT / "local-no-admin" / "consulta_produtos.sqlite"
 SEED_PATH = ROOT / "backend" / "prisma" / "seed-data" / "sample.json"
 PUBLIC_DIR = ROOT / "local-no-admin" / "public"
-HOST = "127.0.0.1"
-PORT = 5173
+HOST = os.environ.get("HOST", "0.0.0.0")
+PORT = int(os.environ.get("PORT", "5173"))
 
 
 def connect():
@@ -326,11 +326,13 @@ class Handler(BaseHTTPRequestHandler):
 
 if __name__ == "__main__":
     init_db()
-    url = f"http://{HOST}:{PORT}/"
-    print(f"Servidor local sem admin: {url}")
+    local_url = f"http://127.0.0.1:{PORT}/"
+    listen_url = f"http://{HOST}:{PORT}/"
+    print(f"Servidor local sem admin: {local_url}")
+    print(f"Escutando na rede: {listen_url}")
     print("Pressione Ctrl+C para parar.")
     try:
-        webbrowser.open(url)
+        webbrowser.open(local_url)
     except Exception:
         pass
     ThreadingHTTPServer((HOST, PORT), Handler).serve_forever()
