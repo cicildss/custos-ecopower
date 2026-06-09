@@ -10,6 +10,29 @@ Aplicação full-stack para consultar produtos, saldo por armazém, cadastro e n
 
 ## Rodando Localmente
 
+### Hospedagem interna com Node
+
+Para hospedar no padrao de sistemas internos da VM, com uma porta propria, use o modo Node:
+
+```powershell
+cd C:\custos-ecopower
+git pull
+$env:HOST = "0.0.0.0"
+$env:PORT = "5173"
+npm run start:local
+```
+
+Com PM2:
+
+```powershell
+cd C:\custos-ecopower
+npm install -g pm2
+pm2 start local-no-admin\server-node.mjs --name custos-ecopower --interpreter node --update-env
+pm2 save
+```
+
+O acesso da equipe fica em `http://IP-DA-VM:5173/`.
+
 ### Opcao sem administrador
 
 Se voce nao consegue instalar Docker, use o modo local sem admin:

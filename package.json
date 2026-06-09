@@ -2,6 +2,7 @@
   "name": "consulta-produtos-protheus",
   "private": true,
   "scripts": {
+    "start:local": "node local-no-admin/server-node.mjs",
     "dev": "npm run dev --workspace backend",
     "dev:frontend": "npm run dev --workspace frontend",
     "build": "npm run build --workspace backend && npm run build --workspace frontend",

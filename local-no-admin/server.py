@@ -331,8 +331,9 @@ if __name__ == "__main__":
     print(f"Servidor local sem admin: {local_url}")
     print(f"Escutando na rede: {listen_url}")
     print("Pressione Ctrl+C para parar.")
-    try:
-        webbrowser.open(local_url)
-    except Exception:
-        pass
+    if os.environ.get("NO_BROWSER") != "1":
+        try:
+            webbrowser.open(local_url)
+        except Exception:
+            pass
     ThreadingHTTPServer((HOST, PORT), Handler).serve_forever()
