@@ -4,7 +4,6 @@ import {
   AlertTriangle,
   Bell,
   Boxes,
-  CheckCircle2,
   Clock3,
   Database,
   FileSpreadsheet,
@@ -17,7 +16,6 @@ import {
   ReceiptText,
   RefreshCw,
   Search,
-  Server,
   ShieldCheck,
   Warehouse,
 } from "lucide-react";
@@ -249,7 +247,7 @@ function BlockedAccess({ profile }: { profile: ProfileInfo }) {
 }
 
 function AppShell({ profile }: { profile: ProfileInfo }) {
-  const [view, setView] = useState<ViewId>(() => (localStorage.getItem("costs:view") as ViewId) || "dashboard");
+  const [view, setView] = useState<ViewId>(() => (localStorage.getItem("costs:view") as ViewId) || "consulta");
   const [search, setSearch] = useState("");
   const [selectedCode, setSelectedCode] = useState<string>();
   const [filial, setFilial] = useState("");
@@ -380,14 +378,16 @@ function AppShell({ profile }: { profile: ProfileInfo }) {
         </header>
 
         <main className="content">
-          <section className="hero-card">
-            <div>
+          <section className="command-strip">
+            <div className="command-copy">
               <span className="eyebrow"><PackageSearch size={14} /> Consulta Protheus</span>
-              <h1>Custos EcoPower</h1>
-              <p>Produtos, estoque, custo médio e notas de entrada em uma visão protegida por login corporativo.</p>
+              <div>
+                <h1>Consulta de custos</h1>
+                <p>Pesquise produto, confira saldo, custo médio, entradas e cadastro em uma tela mais direta.</p>
+              </div>
             </div>
-            <div className="hero-actions">
-              <label className="filial-field">
+            <div className="command-tools">
+              <label className="filial-field compact">
                 <span>Filial</span>
                 <input
                   value={filial}
@@ -400,36 +400,38 @@ function AppShell({ profile }: { profile: ProfileInfo }) {
               </label>
               <button className="primary-action" type="button" onClick={() => setView("consulta")}>
                 <Search size={17} />
-                Consultar produto
+                Consultar
               </button>
             </div>
-          </section>
-
-          <section className="kpi-grid">
-            {kpis.map((kpi) => {
-              const Icon = kpi.icon;
-              return (
-                <article className="kpi-card" key={kpi.label}>
-                  <div>
-                    <span>{kpi.label}</span>
-                    <strong>{kpi.value}</strong>
-                    <small>{kpi.detail}</small>
-                  </div>
-                  <Icon size={20} />
-                </article>
-              );
-            })}
+            <div className="mini-kpis">
+              {kpis.map((kpi) => {
+                const Icon = kpi.icon;
+                return (
+                  <article className="mini-kpi" key={kpi.label}>
+                    <Icon size={16} />
+                    <div>
+                      <span>{kpi.label}</span>
+                      <strong>{kpi.value}</strong>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
           </section>
 
           {view === "dashboard" && (
             <section className="dashboard-grid">
-              <Panel title="Comece pela busca" subtitle="Pesquise por código, descrição ou referência do produto">
+              <Panel title="Buscar produto" subtitle="Digite código, descrição, grupo ou tipo">
                 <SearchBar value={search} onChange={setSearch} suggestions={products} loading={searchQuery.isFetching} onSelect={selectProduct} />
-                <div className="quick-notes">
-                  <div><CheckCircle2 size={17} /><span>Login compartilhado com Auditoria Interna</span></div>
-                  <div><Server size={17} /><span>Consulta preparada para API Protheus/SQL Server</span></div>
-                  <div><Database size={17} /><span>Detalhes carregados somente após seleção do item</span></div>
-                </div>
+                <ProductList
+                  products={products}
+                  selectedCode={selectedCode}
+                  loading={searchQuery.isFetching}
+                  error={searchQuery.isError}
+                  errorMessage={searchQuery.error instanceof Error ? searchQuery.error.message : undefined}
+                  query={debouncedSearch}
+                  onSelect={selectProduct}
+                />
               </Panel>
               <Panel title="Produto em foco" subtitle={selectedCode ? selectedCode : "Nenhum item selecionado"}>
                 {detail ? (
@@ -437,7 +439,11 @@ function AppShell({ profile }: { profile: ProfileInfo }) {
                     <strong>{productTitle}</strong>
                     <span>{quantity(detail.sb2.total.quantidade)} em estoque</span>
                     <span>{money(detail.sb2.total.custo_total)} de custo consolidado</span>
-                    <button className="secondary-action" onClick={() => setView("consulta")}>Abrir detalhe</button>
+                    <div className="focus-actions">
+                      <button className="secondary-action" onClick={() => setView("consulta")}>Abrir detalhe</button>
+                      <button className="secondary-action" onClick={() => setView("entradas")}>Entradas</button>
+                      <button className="secondary-action" onClick={() => setView("cadastro")}>Cadastro</button>
+                    </div>
                   </div>
                 ) : (
                   <div className="empty-state">Selecione um produto para abrir estoque, entradas e cadastro.</div>
