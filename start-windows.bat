@@ -30,6 +30,15 @@ echo Configurando frontend\.env...
 >> "frontend\.env" echo VITE_SUPABASE_PUBLISHABLE_KEY="sb_publishable_1bsxriJUMqaxUoxK14sZig_XYvk5NDI"
 >> "frontend\.env" echo VITE_API_URL="http://10.1.100.17:3002"
 
+if not exist "backend\.env" (
+  echo Configurando backend\.env...
+  > "backend\.env" echo DATABASE_URL="postgresql://protheus:protheus@localhost:5432/consulta_produtos?schema=public"
+  >> "backend\.env" echo PORT=3002
+  >> "backend\.env" echo CORS_ORIGIN="http://10.1.100.17:5173,http://127.0.0.1:5173,http://localhost:5173"
+) else (
+  echo backend\.env encontrado. Mantendo configuracao existente.
+)
+
 echo Atualizando dependencias e build...
 call npm install
 if errorlevel 1 goto :erro

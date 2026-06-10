@@ -22,13 +22,25 @@ app.get("/health", (_req, res) => {
   res.json({ status: "ok", port, databaseConfigured: Boolean(process.env.DATABASE_URL) });
 });
 
+app.use("/api", (_req, res, next) => {
+  if (!process.env.DATABASE_URL) {
+    res.status(503).json({
+      message: "Banco de dados nao configurado. Configure backend\\.env com DATABASE_URL e reinicie a API.",
+    });
+    return;
+  }
+  next();
+});
+
 app.use("/api/produtos", produtosRouter);
 
 app.use((error: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   console.error(error);
-  res.status(400).json({ message: "Erro ao processar requisição" });
+  const message = error instanceof Error ? error.message : "Erro ao processar requisicao";
+  res.status(400).json({ message });
 });
 
 app.listen(port, () => {
   console.log(`API listening on http://localhost:${port}`);
 });
+
