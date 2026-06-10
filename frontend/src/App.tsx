@@ -18,9 +18,7 @@ import {
   RefreshCw,
   Search,
   Server,
-  Settings,
   ShieldCheck,
-  UserRound,
   Warehouse,
 } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
@@ -33,7 +31,7 @@ import { ProductList } from "./components/ProductList";
 import { SearchBar } from "./components/SearchBar";
 import { StockPanel } from "./components/StockPanel";
 
-type ViewId = "dashboard" | "consulta" | "estoque" | "entradas" | "cadastro" | "config";
+type ViewId = "dashboard" | "consulta" | "estoque" | "entradas" | "cadastro";
 
 type ProfileInfo = {
   name: string;
@@ -50,7 +48,6 @@ const navigation: Array<{ id: ViewId; label: string; description: string; icon: 
   { id: "estoque", label: "Estoque", description: "Saldo e custo médio", icon: Warehouse },
   { id: "entradas", label: "Entradas", description: "Notas fiscais SD1", icon: ReceiptText },
   { id: "cadastro", label: "Cadastro", description: "SB1 e atributos", icon: Boxes },
-  { id: "config", label: "Configurações", description: "Integrações e acesso", icon: Settings, adminOnly: true },
 ];
 
 function useDebouncedValue(value: string, delay: number) {
@@ -340,10 +337,7 @@ function AppShell({ profile }: { profile: ProfileInfo }) {
           })}
         </div>
 
-        <div className="sidebar-card">
-          <span className="mini-label">Acesso</span>
-          <strong>{profile.role}</strong>
-          <small>{profile.sectors.length ? profile.sectors.join(", ") : "Escopo validado no Supabase"}</small>
+        <div className="sidebar-logout">
           <button className="logout-button" onClick={() => supabase?.auth.signOut()}>
             <LogOut size={15} />
             Sair
@@ -506,24 +500,6 @@ function AppShell({ profile }: { profile: ProfileInfo }) {
             <section className="stack">
               <ProductHeader loading={detailQuery.isLoading} error={detailQuery.isError} code={selectedCode} title={productTitle} />
               {detail ? <ProductDetails product={detail.sb1} /> : <EmptyProductMessage />}
-            </section>
-          )}
-
-          {view === "config" && profile.isAdmin && (
-            <section className="dashboard-grid">
-              <Panel title="Integrações" subtitle="Status técnico da plataforma de custos">
-                <div className="settings-list">
-                  <div><Database size={18} /><strong>Supabase Auth</strong><span>{supabaseStatus}</span></div>
-                  <div><Server size={18} /><strong>API de produtos</strong><span>{import.meta.env.VITE_API_URL ?? "http://localhost:3001"}</span></div>
-                  <div><ShieldCheck size={18} /><strong>Gestão de acesso</strong><span>Usuários administrados pela plataforma de Auditoria Interna.</span></div>
-                </div>
-              </Panel>
-              <Panel title="Escopo de acesso" subtitle="Reaproveitamento dos perfis corporativos">
-                <div className="settings-list">
-                  <div><UserRound size={18} /><strong>{profile.name}</strong><span>{profile.email}</span></div>
-                  <div><ListFilter size={18} /><strong>{profile.role}</strong><span>{profile.sectors.length ? profile.sectors.join(", ") : "Sem setor específico informado"}</span></div>
-                </div>
-              </Panel>
             </section>
           )}
         </main>

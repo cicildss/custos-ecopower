@@ -234,7 +234,6 @@ button:disabled {
 
 .logout-button {
   width: 100%;
-  margin-top: 12px;
   border-color: rgba(248, 113, 113, 0.22);
   background: rgba(127, 29, 29, 0.18);
   color: #fecaca;
@@ -363,7 +362,6 @@ button:disabled {
   color: white;
 }
 
-.sidebar-card,
 .panel,
 .kpi-card,
 .hero-card,
@@ -376,20 +374,9 @@ button:disabled {
   backdrop-filter: blur(18px);
 }
 
-.sidebar-card {
+.sidebar-logout {
   margin-top: auto;
-  padding: 14px;
-}
-
-.sidebar-card strong,
-.sidebar-card small {
-  display: block;
-}
-
-.sidebar-card small {
-  margin-top: 4px;
-  color: var(--muted);
-  line-height: 1.5;
+  padding-top: 8px;
 }
 
 .workspace {
