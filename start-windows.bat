@@ -21,6 +21,9 @@ if not exist "package.json" (
 echo Encerrando janelas antigas da plataforma...
 taskkill /FI "WINDOWTITLE eq Custos API*" /T /F >nul 2>nul
 taskkill /FI "WINDOWTITLE eq Custos WEB*" /T /F >nul 2>nul
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$self=$PID; $parent=(Get-CimInstance Win32_Process -Filter \"ProcessId=$PID\").ParentProcessId; $ports=3002,5173; Get-NetTCPConnection -State Listen -ErrorAction SilentlyContinue | Where-Object { $ports -contains $_.LocalPort } | Select-Object -ExpandProperty OwningProcess -Unique | Where-Object { $_ -and $_ -ne $self -and $_ -ne $parent } | ForEach-Object { Stop-Process -Id $_ -Force -ErrorAction SilentlyContinue }; Get-CimInstance Win32_Process | Where-Object { $_.ProcessId -ne $self -and $_.ProcessId -ne $parent -and $_.CommandLine -and $_.CommandLine -like '*custos-ecopower*' -and ($_.Name -eq 'node.exe' -or $_.Name -eq 'cmd.exe') } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }" >nul 2>nul
+timeout /t 2 /nobreak >nul
+del /f /q "node_modules\.prisma\client\query_engine-windows.dll.node.tmp*" >nul 2>nul
 
 echo Configurando frontend\.env...
 > "frontend\.env" echo VITE_SUPABASE_URL="https://hdorhyepkpgayjezubra.supabase.co"
