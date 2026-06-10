@@ -26,7 +26,13 @@ produtosRouter.get("/busca", async (req, res, next) => {
       SELECT b1_cod AS codigo, b1_desc AS descricao
       FROM sb1_produtos
       WHERE ${deletedFilter}
-        AND (TRIM(b1_cod) ILIKE ${term} OR TRIM(b1_desc) ILIKE ${term})
+        AND (
+          TRIM(b1_cod) ILIKE ${term}
+          OR TRIM(b1_desc) ILIKE ${term}
+          OR COALESCE(TRIM(b1_desc_nf), '') ILIKE ${term}
+          OR COALESCE(TRIM(b1_grupo), '') ILIKE ${term}
+          OR COALESCE(TRIM(b1_tipo), '') ILIKE ${term}
+        )
       ORDER BY b1_cod
       LIMIT 50
     `;

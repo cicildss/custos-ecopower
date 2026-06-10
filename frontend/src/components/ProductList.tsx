@@ -4,20 +4,36 @@ type ProductListProps = {
   products: ProductSearchResult[];
   selectedCode?: string;
   loading?: boolean;
+  error?: boolean;
+  errorMessage?: string;
+  query?: string;
   onSelect: (code: string) => void;
 };
 
-export function ProductList({ products, selectedCode, loading, onSelect }: ProductListProps) {
+export function ProductList({ products, selectedCode, loading, error, errorMessage, query = "", onSelect }: ProductListProps) {
+  if (query.trim().length < 2) {
+    return <div className="result-state">Digite ao menos 2 caracteres para buscar produtos.</div>;
+  }
+
   if (loading) {
-    return <div className="rounded-md border border-line bg-panel-soft p-4 text-sm text-slate-400">Buscando produtos...</div>;
+    return <div className="result-state">Buscando produtos...</div>;
+  }
+
+  if (error) {
+    return (
+      <div className="result-state error">
+        <strong>Busca indisponível</strong>
+        <span>{errorMessage ?? "A API não respondeu. Confira se o backend está ativo."}</span>
+      </div>
+    );
   }
 
   if (!products.length) {
-    return <div className="rounded-md border border-line bg-panel-soft p-4 text-sm text-slate-400">Nenhum resultado para exibir.</div>;
+    return <div className="result-state">Nenhum produto encontrado para "{query}".</div>;
   }
 
   return (
-    <div className="overflow-hidden rounded-md border border-line bg-panel-soft">
+    <div className="product-results">
       {products.map((product, index) => {
         const selected = product.codigo === selectedCode;
         return (
@@ -25,12 +41,10 @@ export function ProductList({ products, selectedCode, loading, onSelect }: Produ
             key={`${product.codigo}-${index}`}
             type="button"
             onClick={() => onSelect(product.codigo)}
-            className={`block w-full border-b border-line px-4 py-3 text-left last:border-b-0 transition ${
-              selected ? "bg-brand/35 text-white" : "text-white hover:bg-brand/15"
-            }`}
+            className={`product-result ${selected ? "active" : ""}`}
           >
-            <span className="block text-sm font-semibold">{product.codigo}</span>
-            <span className={`block truncate text-sm ${selected ? "text-white/85" : "text-slate-400"}`}>{product.descricao}</span>
+            <span>{product.codigo}</span>
+            <strong>{product.descricao}</strong>
           </button>
         );
       })}

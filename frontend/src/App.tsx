@@ -68,7 +68,7 @@ function useLiveClock() {
   const [now, setNow] = useState(() => new Date());
 
   useEffect(() => {
-    const timer = window.setInterval(() => setNow(new Date()), 1000);
+    const timer = window.setInterval(() => setNow(new Date()), 60000);
     return () => window.clearInterval(timer);
   }, []);
 
@@ -269,22 +269,27 @@ function AppShell({ profile }: { profile: ProfileInfo }) {
     queryKey: ["products", debouncedSearch],
     queryFn: () => searchProducts(debouncedSearch),
     enabled: debouncedSearch.trim().length > 1,
+    staleTime: 60_000,
   });
 
   const products = searchQuery.data ?? [];
 
   useEffect(() => {
-    if (!products.length) return;
-    if (!selectedCode || !products.some((product) => product.codigo === selectedCode)) {
-      setSelectedCode(products[0].codigo);
+    if (!products.length) {
+      if (debouncedSearch.trim().length > 1) setSelectedCode(undefined);
+      return;
+    }
+    if (selectedCode && !products.some((product) => product.codigo === selectedCode)) {
+      setSelectedCode(undefined);
       setPage(1);
     }
-  }, [products, selectedCode]);
+  }, [debouncedSearch, products, selectedCode]);
 
   const detailQuery = useQuery({
     queryKey: ["product", selectedCode, page, filial],
     queryFn: () => getProduct(selectedCode ?? "", page, filial),
     enabled: Boolean(selectedCode),
+    staleTime: 60_000,
   });
 
   const selectedDescription = useMemo(
@@ -348,7 +353,7 @@ function AppShell({ profile }: { profile: ProfileInfo }) {
 
       <section className="workspace">
         <header className="topbar">
-          <button className="icon-button" aria-label="Atualizar consulta" title="Atualizar consulta" onClick={() => detailQuery.refetch()}>
+          <button className="icon-button" aria-label="Atualizar consulta" title="Atualizar consulta" disabled={!selectedCode} onClick={() => detailQuery.refetch()}>
             <RefreshCw size={18} />
           </button>
           <div className="top-search">
@@ -451,7 +456,15 @@ function AppShell({ profile }: { profile: ProfileInfo }) {
             <section className="consult-grid">
               <aside className="result-column">
                 <Panel title="Resultados" subtitle={debouncedSearch.trim() ? `${products.length} produtos encontrados` : "Digite ao menos 2 caracteres"}>
-                  <ProductList products={products} selectedCode={selectedCode} loading={searchQuery.isFetching} onSelect={selectProduct} />
+                  <ProductList
+                    products={products}
+                    selectedCode={selectedCode}
+                    loading={searchQuery.isFetching}
+                    error={searchQuery.isError}
+                    errorMessage={searchQuery.error instanceof Error ? searchQuery.error.message : undefined}
+                    query={debouncedSearch}
+                    onSelect={selectProduct}
+                  />
                 </Panel>
               </aside>
               <section className="detail-column">
@@ -459,8 +472,16 @@ function AppShell({ profile }: { profile: ProfileInfo }) {
                 {detail && (
                   <>
                     <StockPanel data={detail.sb2} />
-                    <InvoicesTable data={detail.sd1} onPageChange={setPage} />
-                    <ProductDetails product={detail.sb1} />
+                    <section className="next-actions">
+                      <button className="secondary-action" onClick={() => setView("entradas")}>
+                        <ReceiptText size={17} />
+                        Ver notas de entrada
+                      </button>
+                      <button className="secondary-action" onClick={() => setView("cadastro")}>
+                        <Boxes size={17} />
+                        Ver cadastro completo
+                      </button>
+                    </section>
                   </>
                 )}
               </section>

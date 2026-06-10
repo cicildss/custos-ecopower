@@ -7,43 +7,45 @@ type StockPanelProps = {
 
 export function StockPanel({ data }: StockPanelProps) {
   return (
-    <section className="rounded-md border border-line bg-panel">
-      <div className="border-b border-line px-4 py-3">
-        <h2 className="text-base font-semibold">Estoque e valor</h2>
+    <section className="data-panel">
+      <div className="data-panel-header">
+        <div>
+          <h2>Estoque e valor</h2>
+          <p>Saldo por filial e armazém, com custo total e custo unitário calculado.</p>
+        </div>
+        <div className="data-panel-total">
+          <span>Total consolidado</span>
+          <strong>{money(data.total.custo_total)}</strong>
+          <small>{quantity(data.total.quantidade)} un. | {cost(data.total.custo_unitario)} médio</small>
+        </div>
       </div>
-      <div className="overflow-x-auto">
-        <table className="w-full min-w-[620px] text-sm">
-          <thead className="bg-panel-soft text-left text-xs uppercase text-slate-400">
-            <tr>
-              <th className="px-4 py-3">Filial</th>
-              <th className="px-4 py-3">Armazém</th>
-              <th className="px-4 py-3 text-right">Quantidade</th>
-              <th className="px-4 py-3 text-right">Custo total</th>
-              <th className="px-4 py-3 text-right">Custo unitário</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.rows.map((row, index) => (
-              <tr key={`${row.b2_filial}-${row.b2_local}-${index}`} className="border-t border-line hover:bg-brand/10">
-                <td className="px-4 py-3">{row.b2_filial ?? "N/A"}</td>
-                <td className="px-4 py-3">{row.b2_local ?? "N/A"}</td>
-                <td className="px-4 py-3 text-right">{quantity(row.b2_qatu)}</td>
-                <td className="px-4 py-3 text-right">{money(row.b2_cm1)}</td>
-                <td className="px-4 py-3 text-right">{cost(row.custo_unitario)}</td>
-              </tr>
-            ))}
-          </tbody>
-          <tfoot className="border-t border-line bg-brand/10 font-semibold">
-            <tr>
-              <td className="px-4 py-3" colSpan={2}>
-                Total consolidado
-              </td>
-              <td className="px-4 py-3 text-right">{quantity(data.total.quantidade)}</td>
-              <td className="px-4 py-3 text-right">{money(data.total.custo_total)}</td>
-              <td className="px-4 py-3 text-right">{cost(data.total.custo_unitario)}</td>
-            </tr>
-          </tfoot>
-        </table>
+
+      <div className="stock-list">
+        {data.rows.map((row, index) => (
+          <article className="stock-row" key={`${row.b2_filial}-${row.b2_local}-${index}`}>
+            <div>
+              <span className="row-label">Filial</span>
+              <strong>{row.b2_filial ?? "N/A"}</strong>
+            </div>
+            <div>
+              <span className="row-label">Armazém</span>
+              <strong>{row.b2_local ?? "N/A"}</strong>
+              {row.b2_descricao && <small>{row.b2_descricao}</small>}
+            </div>
+            <div className="numeric">
+              <span className="row-label">Quantidade</span>
+              <strong>{quantity(row.b2_qatu)}</strong>
+            </div>
+            <div className="numeric">
+              <span className="row-label">Custo total</span>
+              <strong>{money(row.b2_cm1)}</strong>
+            </div>
+            <div className="numeric">
+              <span className="row-label">Custo unitário</span>
+              <strong>{cost(row.custo_unitario)}</strong>
+            </div>
+          </article>
+        ))}
       </div>
     </section>
   );

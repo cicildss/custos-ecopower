@@ -19,6 +19,20 @@ const labels: Record<string, string> = {
   b1_ult_compra: "Última compra",
 };
 
+const priorityKeys = [
+  "b1_cod",
+  "b1_desc",
+  "b1_desc_nf",
+  "b1_um",
+  "b1_tipo",
+  "b1_grupo",
+  "b1_posipi",
+  "b1_local_pad",
+  "b1_preco_venda",
+  "b1_ult_preco",
+  "b1_ult_compra",
+];
+
 function display(value: unknown) {
   if (value === null || value === undefined || value === "") return "N/A";
   if (typeof value === "object") return JSON.stringify(value);
@@ -26,21 +40,30 @@ function display(value: unknown) {
 }
 
 export function ProductDetails({ product }: ProductDetailsProps) {
-  const entries = Object.entries(product).filter(([key]) => !["id", "created_at", "updated_at", "d_e_l_e_t_"].includes(key));
+  const excluded = new Set(["id", "created_at", "updated_at", "d_e_l_e_t_"]);
+  const entries = Object.entries(product).filter(([key]) => !excluded.has(key));
+  const orderedEntries = [
+    ...priorityKeys.filter((key) => key in product).map((key) => [key, product[key]] as [string, unknown]),
+    ...entries.filter(([key]) => !priorityKeys.includes(key)),
+  ];
 
   return (
-    <section className="rounded-md border border-line bg-panel">
-      <div className="border-b border-line px-4 py-3">
-        <h2 className="text-base font-semibold">Cadastro do produto</h2>
+    <section className="data-panel">
+      <div className="data-panel-header">
+        <div>
+          <h2>Cadastro do produto</h2>
+          <p>Campos principais do SB1, priorizados para leitura operacional.</p>
+        </div>
       </div>
-      <dl className="grid gap-px bg-line text-sm sm:grid-cols-2 lg:grid-cols-3">
-        {entries.map(([key, value]) => (
-          <div key={key} className="min-w-0 bg-panel px-4 py-3">
-            <dt className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">{labels[key] ?? key}</dt>
-            <dd className="mt-1 break-words text-slate-100">{display(value)}</dd>
-          </div>
+
+      <div className="details-grid">
+        {orderedEntries.map(([key, value]) => (
+          <article key={key} className="detail-card">
+            <span className="row-label">{labels[key] ?? key}</span>
+            <strong>{display(value)}</strong>
+          </article>
         ))}
-      </dl>
+      </div>
     </section>
   );
 }
